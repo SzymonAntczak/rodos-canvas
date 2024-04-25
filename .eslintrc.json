@@ -32,7 +32,8 @@
             "style": "kebab-case"
           }
         ],
-        "prettier/prettier": ["warn"]
+        "prettier/prettier": ["warn"],
+        "@typescript-eslint/consistent-type-imports": "warn"
       }
     },
     {
