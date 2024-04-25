@@ -44,8 +44,5 @@ export class CanvasComponent implements AfterViewInit {
     );
 
     this.scene.addHelpers();
-    this.scene.addBox();
-    this.scene.addPlane();
-    this.scene.addSphere();
   }
 }

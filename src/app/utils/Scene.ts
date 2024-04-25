@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 export class Scene {
   private _scene = new THREE.Scene();
-  private _camera?: THREE.PerspectiveCamera;
+  private _camera?: THREE.OrthographicCamera;
   private _renderer?: THREE.WebGLRenderer;
 
   constructor(
@@ -14,10 +14,10 @@ export class Scene {
   }
 
   addHelpers(): void {
-    const axesHelper = new THREE.AxesHelper(3);
+    const axesHelper = new THREE.AxesHelper(500);
     this._scene.add(axesHelper);
 
-    const gridHelper = new THREE.GridHelper(10, 10);
+    const gridHelper = new THREE.GridHelper(500, 50);
     this._scene.add(gridHelper);
   }
 
@@ -29,21 +29,6 @@ export class Scene {
     this._scene.add(box);
 
     return box;
-  }
-
-  addPlane(): THREE.Mesh {
-    const planeGeometry = new THREE.PlaneGeometry(10, 10);
-    const planeMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.DoubleSide,
-    });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-
-    plane.rotation.x = Math.PI / 2;
-
-    this._scene.add(plane);
-
-    return plane;
   }
 
   addSphere(): THREE.Mesh {
@@ -62,40 +47,66 @@ export class Scene {
   }
 
   updateSceneSize(container: HTMLDivElement): void {
-    this._canvas.style.setProperty('width', '0');
-    this._canvas.style.setProperty('height', '0');
+    console.log(container);
+    // this._canvas.style.setProperty('width', '0');
+    // this._canvas.style.setProperty('height', '0');
 
-    if (!this._camera) return;
+    // if (!this._camera) return;
 
-    this._camera.aspect = container.offsetWidth / container.offsetHeight;
-    this._camera.updateProjectionMatrix();
+    // this._camera.aspect = container.offsetWidth / container.offsetHeight;
+    // this._camera.updateProjectionMatrix();
 
-    if (!this._renderer) return;
+    // if (!this._renderer) return;
 
-    this._renderer.setSize(container.offsetWidth, container.offsetHeight);
-    this._renderer.render(this._scene, this._camera);
+    // this._renderer.setSize(container.offsetWidth, container.offsetHeight);
+    // this._renderer.render(this._scene, this._camera);
   }
 
   private init(container: HTMLDivElement, canvas: HTMLCanvasElement): void {
     this._renderer = new THREE.WebGLRenderer({ canvas });
     this._renderer.setSize(container.offsetWidth, container.offsetHeight);
 
-    this._camera = new THREE.PerspectiveCamera(
-      75,
-      container.offsetWidth / container.offsetHeight,
-      0.001,
-      1000,
+    this._camera = new THREE.OrthographicCamera(
+      container.offsetWidth / -2,
+      container.offsetWidth / 2,
+      container.offsetHeight / 2,
+      container.offsetHeight / -2,
     );
 
-    const orbit = new OrbitControls(this._camera, this._renderer.domElement);
+    const controls = new OrbitControls(this._camera, this._renderer.domElement);
+    controls.enableRotate = false;
+    controls.minZoom = 1;
+    controls.maxZoom = 2;
 
-    this._camera.position.set(1, 2, 5);
-    orbit.update();
+    controls.addEventListener('change', () => {
+      console.log(this._camera?.zoom);
+    });
+
+    this._camera.position.set(0, 2000, 0);
+    controls.update();
+
+    // this.addPlane();
 
     this._renderer.setAnimationLoop(() => {
       if (!this._renderer || !this._camera) return;
 
+      controls.update();
       this._renderer.render(this._scene, this._camera);
     });
+  }
+
+  private addPlane(): THREE.Mesh {
+    const planeGeometry = new THREE.PlaneGeometry(500, 500);
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+    });
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+    plane.rotation.x = Math.PI / 2;
+
+    this._scene.add(plane);
+
+    return plane;
   }
 }
