@@ -6,7 +6,7 @@ const {
 module.exports = withModuleFederationPlugin({
   name: "rodos-canvas",
   exposes: {
-    "./Component": "./src/app/app.component.ts",
+    "./Component": "./src/app/components/canvas/canvas.component.ts",
   },
   shared: {
     ...shareAll({

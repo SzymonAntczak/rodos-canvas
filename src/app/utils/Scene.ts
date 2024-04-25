@@ -2,20 +2,23 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 export class Scene {
-  private scene = new THREE.Scene();
-  private camera?: THREE.PerspectiveCamera;
-  private renderer?: THREE.WebGLRenderer;
+  private _scene = new THREE.Scene();
+  private _camera?: THREE.PerspectiveCamera;
+  private _renderer?: THREE.WebGLRenderer;
 
-  constructor(container: HTMLDivElement, canvas: HTMLCanvasElement) {
-    this.init(container, canvas);
+  constructor(
+    container: HTMLDivElement,
+    private _canvas: HTMLCanvasElement,
+  ) {
+    this.init(container, _canvas);
   }
 
   addHelpers(): void {
     const axesHelper = new THREE.AxesHelper(3);
-    this.scene.add(axesHelper);
+    this._scene.add(axesHelper);
 
     const gridHelper = new THREE.GridHelper(10, 10);
-    this.scene.add(gridHelper);
+    this._scene.add(gridHelper);
   }
 
   addBox(): THREE.Mesh {
@@ -23,7 +26,7 @@ export class Scene {
     const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const box = new THREE.Mesh(boxGeometry, boxMaterial);
 
-    this.scene.add(box);
+    this._scene.add(box);
 
     return box;
   }
@@ -38,7 +41,7 @@ export class Scene {
 
     plane.rotation.x = Math.PI / 2;
 
-    this.scene.add(plane);
+    this._scene.add(plane);
 
     return plane;
   }
@@ -53,43 +56,46 @@ export class Scene {
 
     sphere.position.set(0, 2, 0);
 
-    this.scene.add(sphere);
+    this._scene.add(sphere);
 
     return sphere;
   }
 
   updateSceneSize(container: HTMLDivElement): void {
-    if (!this.camera) return;
+    this._canvas.style.setProperty('width', '0');
+    this._canvas.style.setProperty('height', '0');
 
-    this.camera.aspect = container.offsetWidth / container.offsetHeight;
-    this.camera.updateProjectionMatrix();
+    if (!this._camera) return;
 
-    if (!this.renderer) return;
+    this._camera.aspect = container.offsetWidth / container.offsetHeight;
+    this._camera.updateProjectionMatrix();
 
-    this.renderer.setSize(container.offsetWidth, container.offsetHeight);
-    this.renderer.render(this.scene, this.camera);
+    if (!this._renderer) return;
+
+    this._renderer.setSize(container.offsetWidth, container.offsetHeight);
+    this._renderer.render(this._scene, this._camera);
   }
 
   private init(container: HTMLDivElement, canvas: HTMLCanvasElement): void {
-    this.renderer = new THREE.WebGLRenderer({ canvas });
-    this.renderer.setSize(container.offsetWidth, container.offsetHeight);
+    this._renderer = new THREE.WebGLRenderer({ canvas });
+    this._renderer.setSize(container.offsetWidth, container.offsetHeight);
 
-    this.camera = new THREE.PerspectiveCamera(
+    this._camera = new THREE.PerspectiveCamera(
       75,
       container.offsetWidth / container.offsetHeight,
       0.001,
       1000,
     );
 
-    const orbit = new OrbitControls(this.camera, this.renderer.domElement);
+    const orbit = new OrbitControls(this._camera, this._renderer.domElement);
 
-    this.camera.position.set(1, 2, 5);
+    this._camera.position.set(1, 2, 5);
     orbit.update();
 
-    this.renderer.setAnimationLoop(() => {
-      if (!this.renderer || !this.camera) return;
+    this._renderer.setAnimationLoop(() => {
+      if (!this._renderer || !this._camera) return;
 
-      this.renderer.render(this.scene, this.camera);
+      this._renderer.render(this._scene, this._camera);
     });
   }
 }
